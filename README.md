@@ -239,6 +239,15 @@ MIT License.
 
 ---
 
+## Links
+
+- [Official site](https://www.axis-3.com)
+- [Whitepaper](https://www.axis-3.com/whitepaper)
+- [Contact](https://www.axis-3.com/contact)
+- [Repository](https://github.com/ShinY1229/axis-one)
+
+---
+
 ## Author / Publisher
 
 axis one is authored by Shin Yamazaki and published by axis Inc.
