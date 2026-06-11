@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convenience Rent — an axis one co-rendering prototype</title>
+<style>
+  :root{
+    --ink:#e9e7e2; --sub:#a29e95; --faint:#6d6a63;
+    --bg:#131210; --panel:#1b1916; --panel2:#211e1a; --line:#2f2c26;
+    --gold:#c8a24a; --blue:#7298ad;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:
+      radial-gradient(1200px 600px at 70% -10%, rgba(114,152,173,.06), transparent),
+      radial-gradient(900px 500px at 10% 110%, rgba(200,162,74,.05), transparent),
+      var(--bg);
+    color:var(--ink);
+    font-family:Georgia,"Times New Roman",serif;
+    line-height:1.85; letter-spacing:.01em;
+    display:flex; align-items:center; justify-content:center;
+    padding:24px; min-height:100vh;
+  }
+  .stage{
+    width:100%; max-width:660px; background:var(--panel);
+    border:1px solid var(--line); border-radius:5px;
+    padding:44px 40px 36px; position:relative;
+    box-shadow:0 40px 100px rgba(0,0,0,.55);
+  }
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:30px}
+  .tag{font-family:"Helvetica Neue",sans-serif;font-size:11px;letter-spacing:.28em;color:var(--faint);text-transform:uppercase}
+  .lap{font-family:"Helvetica Neue",sans-serif;font-size:10.5px;letter-spacing:.16em;color:var(--gold);opacity:.0;transition:.4s}
+  .lap.on{opacity:.85}
+  .scene{min-height:210px}
+  .scene p{margin-bottom:16px;font-size:16px}
+  .scene p.dim{color:var(--sub);font-size:14.5px;margin-top:22px;font-style:italic}
+  .choices{margin-top:28px;display:flex;flex-direction:column;gap:11px}
+  button.choice{
+    text-align:left;background:transparent;color:var(--ink);
+    border:1px solid var(--line);border-radius:3px;
+    padding:14px 17px;font-family:inherit;font-size:14.5px;cursor:pointer;
+    transition:.18s;line-height:1.6;
+  }
+  button.choice:hover{border-color:var(--gold);background:rgba(200,162,74,.06);transform:translateX(3px)}
+  .progress{font-family:"Helvetica Neue",sans-serif;font-size:10.5px;letter-spacing:.2em;color:var(--faint);margin-top:26px;text-align:right}
+  /* intro */
+  .intro h1{font-size:30px;font-weight:600;letter-spacing:.01em;margin-bottom:6px}
+  .intro .sub{color:var(--sub);font-size:14.5px;margin-bottom:26px;font-style:italic}
+  .intro p{font-size:15px;color:var(--ink);margin-bottom:14px}
+  .start{margin-top:30px}
+  .start button{background:var(--gold);color:#1a160c;border:none;border-radius:3px;font-family:"Helvetica Neue",sans-serif;font-size:15px;padding:13px 30px;cursor:pointer;letter-spacing:.04em;transition:.18s}
+  .start button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  /* map */
+  canvas{display:block;width:100%;height:260px;background:radial-gradient(circle at 50% 45%,#1a1813,#0e0d0b);border:1px solid var(--line);border-radius:3px}
+  .axisline{font-family:"Helvetica Neue",sans-serif;font-size:10px;color:var(--faint);margin-top:9px;letter-spacing:.04em;display:flex;justify-content:space-between}
+  /* reco */
+  .reco{margin-top:24px;display:flex;flex-direction:column;gap:0}
+  .reco .row{border-top:1px solid var(--line);padding:15px 0}
+  .reco .lbl{font-family:"Helvetica Neue",sans-serif;font-size:10.5px;letter-spacing:.16em;color:var(--blue);text-transform:uppercase;margin-bottom:6px}
+  .reco .lbl.c{color:var(--gold)}
+  .reco .pick{font-size:16px}
+  .reco .pick .g{color:var(--faint);font-size:13px}
+  .reco .why{font-size:13px;color:var(--sub);margin-top:4px;line-height:1.6}
+  .lines{margin:20px 0 4px}
+  .lines p{font-size:15px;margin-bottom:6px}
+  .note{font-size:12px;color:var(--faint);margin-top:20px;line-height:1.7;font-family:"Helvetica Neue",sans-serif}
+  .actions{margin-top:26px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .actions button{background:transparent;border:1px solid var(--line);color:var(--sub);font-family:"Helvetica Neue",sans-serif;font-size:12px;letter-spacing:.06em;padding:10px 20px;border-radius:3px;cursor:pointer;transition:.18s}
+  .actions button:hover{border-color:var(--gold);color:var(--ink)}
+  .origin{margin-top:18px;text-align:center;font-family:"Helvetica Neue",sans-serif;font-size:11.5px;letter-spacing:.04em}
+  .origin a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(114,152,173,.4);padding-bottom:1px}
+  .origin a:hover{color:var(--gold);border-bottom-color:var(--gold)}
+  .origin .soon{color:var(--faint)}
+  .fade{animation:f .55s ease}
+  @keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .colophon{margin-top:26px;text-align:center;font-family:"Helvetica Neue",sans-serif;font-size:10px;letter-spacing:.16em;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="topbar"><div class="tag" id="tag">Convenience Rent</div><div class="lap" id="lap"></div></div>
+  <div id="app"></div>
+</div>
+
+<script>
+// ════════════ Observation axes — we read the "angle", not the subject (whitepaper ch.5, reaction star map) ════════════
+//  conv    question convenience (-)  ⇆  add convenience (+)
+//  solo    let go / hand off (-)     ⇆  hold it all yourself (+)
+//  surface take it as it is (-)      ⇆  go look at the structure (+)
+//  pace    stop and look (-)         ⇆  push on ahead (+)
+const A = ()=>({conv:0,solo:0,surface:0,pace:0,count:0});
+let axes = A();
+// points accumulate across laps (rogue-like: the star map gets denser each lap)
+let history = []; // {conv,solo,surface,pace} per choice across laps
+let lap = 0;
+
+// ── Set this once the original is published, then the result screen links to it ──
+const CORE_SPEC_URL = '../../core/axis_one_core_spec_lite_v0_2_3_2026_06_12.md';
+const PUBLIC_SPEC_URL = '../../core/axis_one_public_core_spec_v0_2_3_2026_06_12.yml';
+const SUBSTACK_URL = ""; // e.g. "https://shiny1229.substack.com"
+
+// ════════════ Story — Convenience Rent (visual novel) ════════════
+const story = [
+  { text:[
+      "Friday night. On your desk, three notifications go off at once.",
+      "The expense app. The time-tracking clock-in. A storage service you only signed up for last month, already warning you it's almost full.",
+      "Every one of them, you installed yourself, to make life easier. It was supposed to be easier.",
+    ], dim:"— What do you do?",
+    ch:[
+      {t:"Clear them all, right now. Letting them pile up only gets heavier.", e:{conv:+1,solo:+1,pace:+1}},
+      {t:"Go through them one by one, asking if you actually need each.", e:{conv:-1,surface:+1,pace:-1}},
+      {t:"The notifications themselves bother you. Why do they go off this much?", e:{surface:+2,pace:-1}},
+    ]},
+  { text:[
+      "Saturday morning. As if fleeing, you board a train to a town you don't know.",
+      "In your seat, you open the travel app first. Check-in QR, payment, a local transit pass, reviews of everything nearby.",
+      "Nothing trips you up. Your thumb glides. Nothing trips you up — and yet, somehow, your breathing is a little shallow.",
+    ], dim:"— What do you do?",
+    ch:[
+      {t:"It's convenient, so use all of it. Plan the trip down to the last detail.", e:{conv:+2,pace:+1}},
+      {t:"Close the app. When you get off, you'll just ask someone for directions.", e:{conv:-1,solo:-1}},
+      {t:"Watch the window and wonder why 'nothing wrong, but shallow breath' happens.", e:{surface:+2,conv:-1,pace:-1}},
+    ]},
+  { text:[
+      "Noon. You cut through a half-shuttered main street. Among the closed storefronts, one old diner is still open.",
+      "The menu is coffee, toast, and a plate of spaghetti. That's all. No QR code, no app.",
+      "Behind the counter, the owner grinds beans slowly, a radio murmuring beside him.",
+    ], dim:"— What do you do?",
+    ch:[
+      {t:"Inefficient, but it has character. Not bad, you think, and take a photo.", e:{conv:+1,solo:+1}},
+      {t:"Just order a coffee, and listen to the sound of the grinder.", e:{conv:-2,solo:-1,pace:-1}},
+      {t:"Wonder why this inefficient little place has bothered to survive at all.", e:{surface:+2}},
+    ]},
+  { text:[
+      "Late afternoon. Down a side street, an old public bathhouse, steam rising from its chimney.",
+      "A wooden counter. Numbered keys on the shoe lockers. Worn plastic stools. Almost without thinking, you switch your phone off.",
+      "Sinking into the hot water, your shoulders finally seem to come loose.",
+    ], dim:"— What do you do?",
+    ch:[
+      {t:"You don't want to forget this. Turn the phone back on and capture it.", e:{conv:+1,solo:+1,pace:+1}},
+      {t:"Keep nothing. Just stay in the water.", e:{conv:-2,solo:-1,pace:-1}},
+      {t:"Wonder why your shoulders loosen here, and never in your own bath at home.", e:{surface:+2}},
+    ]},
+  { text:[
+      "Back in the changing room. The sweat has dried; your head is light.",
+      "A faded mural of a mountain on the wall. Beside it, one brand-new printed notice.",
+      "\"Now offering a subscription — unlimited visits, monthly. Get the app here →\" A QR code looks back at you.",
+    ], dim:"— What do you do?",
+    ch:[
+      {t:"Unlimited visits — that's a deal. You sign up on the spot.", e:{conv:+2,pace:+1}},
+      {t:"Laugh a little, sign up for nothing, and step outside.", e:{conv:-1,surface:+1}},
+      {t:"Stop. Notice that the thing you fled from is here too, in the same shape.", e:{surface:+2,conv:-1,pace:-1}},
+    ]},
+  { text:[
+      "Outside, it's night already.",
+      "On the way back to the station, the phone in your pocket buzzes again, small. Expenses. Time-tracking. Storage almost full.",
+      "The town changed completely — but the way it buzzes is exactly the same as Friday night.",
+    ], dim:"— What do you do?",
+    ch:[
+      {t:"Just back to normal. On the train, clear the backlog of notifications.", e:{conv:+1,solo:+1,pace:+1}},
+      {t:"Not tonight. Put it back in your pocket and walk through the dark town.", e:{conv:-1,solo:-1,pace:-1}},
+      {t:"Start thinking about how you're going to live with this buzzing, from here on.", e:{surface:+2,pace:-1}},
+    ]},
+];
+
+// ════════════ Fictional placeholder catalog (titles are made up; in production, a real catalog) ════════════
+const games = [
+  {title:"The Quiet Harvest", genre:"slow-life farming", vec:{conv:-1,solo:-1,surface:0,pace:-1}},
+  {title:"Border Desk No. 9", genre:"dystopian choices", vec:{conv:+1,solo:+1,surface:+2,pace:+1}},
+  {title:"The Long Confession", genre:"introspective RPG / dialogue", vec:{conv:-1,solo:0,surface:+2,pace:-1}},
+  {title:"Ferry of Small Goodbyes", genre:"caretaking / management", vec:{conv:0,solo:-1,surface:+1,pace:-1}},
+  {title:"The Silent Garden", genre:"wordless puzzle exploration", vec:{conv:-1,solo:-1,surface:+2,pace:-1}},
+  {title:"Endless Swarm", genre:"reflex / score", vec:{conv:+2,solo:+1,surface:-1,pace:+2}},
+  {title:"The Far Orbit", genre:"exploration / space / mystery", vec:{conv:-1,solo:-1,surface:+2,pace:-1}},
+  {title:"Boxes & Rooms", genre:"tidying / wordless story", vec:{conv:0,solo:-1,surface:+1,pace:-1}},
+  {title:"Night Counter", genre:"everyday / conversation", vec:{conv:0,solo:0,surface:+1,pace:-1}},
+  {title:"Falling Blocks Forever", genre:"reflex / immersion", vec:{conv:+1,solo:+1,surface:0,pace:+1}},
+  {title:"The Logbook Mystery", genre:"deduction / observation", vec:{conv:-1,solo:-1,surface:+2,pace:0}},
+  {title:"One Short Walk", genre:"strolling / small adventure", vec:{conv:-1,solo:-1,surface:0,pace:-1}},
+  {title:"Neon Arrears", genre:"big-budget city / choices", vec:{conv:+2,solo:0,surface:+1,pace:+1}},
+  {title:"The Dealer's Game", genre:"cards / meta / unease", vec:{conv:0,solo:+1,surface:+2,pace:0}},
+];
+
+const app=document.getElementById('app');
+const lapEl=document.getElementById('lap');
+const tagEl=document.getElementById('tag');
+let step=0;
+
+function startIntro(){
+  tagEl.textContent="Convenience Rent";
+  app.innerHTML=`<div class="intro fade">
+    <h1>Convenience Rent</h1>
+    <div class="sub">a co-rendering visual novel — a small taste of C-mode / C-recommendation</div>
+    <p style="color:var(--sub);font-size:14px;font-style:italic;margin-bottom:20px">Convenience Rent — the recurring, easy-to-miss cost we keep paying for convenience.</p>
+    <p>This is a short story. There are no right or wrong choices.</p>
+    <p>At each scene, what you choose — that's all we quietly watch.</p>
+    <p>When you finish, from the "angle" of what you react to, we'll hand you back a single recommendation.</p>
+    <div class="start"><button id="go">Begin</button></div>
+    <div class="colophon">axis one · GHOST POLISH THINKING · CREATED THROUGH CO-RENDERING</div>
+  </div>`;
+  document.getElementById('go').onclick=()=>{ step=0; axes=A(); render(); };
+}
+
+function render(){
+  lapEl.classList.toggle('on', lap>0);
+  lapEl.textContent = lap>0 ? `LAP ${lap+1} · ${history.length} STARS` : "";
+  if(step<story.length) renderScene(story[step]);
+  else renderResult();
+}
+
+function renderScene(s){
+  let h=`<div class="scene fade">`;
+  s.text.forEach(p=>h+=`<p>${p}</p>`);
+  h+=`<p class="dim">${s.dim}</p></div><div class="choices fade">`;
+  s.ch.forEach((c,i)=>h+=`<button class="choice" data-i="${i}">${c.t}</button>`);
+  h+=`</div><div class="progress">${step+1} / ${story.length}</div>`;
+  app.innerHTML=h;
+  tagEl.textContent="Convenience Rent";
+  app.querySelectorAll('.choice').forEach(b=>{
+    b.onclick=()=>{
+      const c=s.ch[+b.dataset.i];
+      const pt={conv:0,solo:0,surface:0,pace:0};
+      for(const k in c.e){axes[k]+=c.e[k];pt[k]=c.e[k];}
+      axes.count++; history.push(pt);
+      step++; render();
+    };
+  });
+}
+
+function norm(){
+  // Base the angle on the full history (accumulated across laps = LiDAR compounding).
+  // Give the most recent lap a light extra weight, so today's "water temperature" (B) is also read.
+  const acc={conv:0,solo:0,surface:0,pace:0}; let w=0;
+  const recentN=axes.count;            // points placed this lap
+  const total=history.length;          // points across all laps
+  history.forEach((p,i)=>{
+    const recent = (total-i)<=recentN ? 1.6 : 1.0; // tail (this lap) weighs slightly more
+    acc.conv+=p.conv*recent; acc.solo+=p.solo*recent;
+    acc.surface+=p.surface*recent; acc.pace+=p.pace*recent;
+    w+=recent;
+  });
+  const sp=(w*2)||1;
+  return {conv:acc.conv/sp,solo:acc.solo/sp,surface:acc.surface/sp,pace:acc.pace/sp};
+}
+
+function describe(v){
+  const o=[];
+  o.push(v.conv<=-0.12?"Someone who feels a small snag when convenience is added":
+         v.conv>=0.12?"Someone who takes convenient things in and uses them first":"Someone who deals with convenience case by case");
+  o.push(v.surface>=0.22?"Someone whose hand reaches for the structure behind what happened":
+         v.surface>=0.08?"Someone who, now and then, is drawn to how a thing works":"Someone who takes what's in front of them as it is, first");
+  if(v.pace<=-0.12)o.push("Someone who, rather than push ahead, stops and looks");
+  else if(v.pace>=0.18)o.push("Someone who, rather than stop, keeps their hands moving forward");
+  if(v.solo<=-0.1)o.push("Someone who leans toward letting go and handing off, rather than holding it all");
+  else if(v.solo>=0.18)o.push("Someone who would rather keep hold of it than pass it on");
+  return o;
+}
+
+function score(v){
+  return games.map(g=>{
+    const dot=v.conv*g.vec.conv+v.solo*g.vec.solo+v.surface*g.vec.surface+v.pace*g.vec.pace;
+    return {...g,fit:dot};
+  });
+}
+
+function renderResult(){
+  const v=norm();
+  const scored=score(v).sort((a,b)=>b.fit-a.fit);
+  const genrePick=scored[0];
+  const storyPick=[...scored].sort((a,b)=>(b.vec.surface-a.vec.surface)||(b.fit-a.fit))[0];
+  // "You might be surprised": the surface (conv = attitude to convenience) is far from / opposite you,
+  // but the deeper angle (surface, pace = go look at structure / stop and look) is close.
+  // Hit on the angle, not on the subject.
+  const cPick=[...scored]
+    .filter(g=>g!==genrePick && g!==storyPick)
+    .map(g=>{
+      const angleNear = -(Math.abs(v.surface-g.vec.surface*0.25)+Math.abs(v.pace-g.vec.pace*0.25));
+      const convFar   =  Math.abs(v.conv-g.vec.conv*0.25); // the farther the surface, the more "surprising"
+      return {g, s: angleNear*1.0 + convFar*0.6};
+    })
+    .sort((a,b)=>b.s-a.s)[0].g;
+  const lines=describe(v);
+
+  const originHTML = SUBSTACK_URL
+    ? `<div class="origin">Read the original story → <a href="${SUBSTACK_URL}" target="_blank" rel="noopener">on Substack</a></div>`
+    : `<div class="origin"><span class="soon">The original story will be published soon.</span></div>`;
+
+  let h=`<div class="scene fade">
+    <p class="dim" style="margin-top:0">We laid out your choices so far as stars. From these observation points, here's what we'd hand you.</p>
+    <canvas id="cv" width="620" height="260"></canvas>
+    <div class="axisline"><span>← question convenience / add it →</span><span>↑ go to the structure / take as-is ↓</span></div>
+    <div class="lines">`;
+  lines.forEach(l=>h+=`<p>· ${l}</p>`);
+  h+=`</div>
+    <div class="reco">
+      <div class="row"><div class="lbl">A genre you'd likely enjoy</div>
+        <div class="pick">${genrePick.genre}</div>
+        <div class="why">The closest, most straightforward match to the reaction you're showing.</div></div>
+      <div class="row"><div class="lbl">A story you'd likely enjoy</div>
+        <div class="pick">${storyPick.title} <span class="g">(${storyPick.genre})</span></div>
+        <div class="why">Something that suits the way your hand reaches past the surface, toward what's underneath.</div></div>
+      <div class="row"><div class="lbl c">You might be surprised by this one</div>
+        <div class="pick">${cPick.title} <span class="g">(${cPick.genre})</span></div>
+        <div class="why">The genre or subject may look off, for you. But the shape of your reaction — the angle — is close. If it misses, that's an observation point too. You can stop after one go.</div></div>
+    </div>
+    <div class="note">* This is only a test (a demo). The titles shown are fictional, made up purely to illustrate how the matching works — they are not real products. In production, this angle is matched against a proper catalog.<br>
+    * Play again, choosing differently, and the observation points accumulate — the recommendation gets sharper. (stars so far: ${history.length})</div>
+    <div class="actions">
+      <button id="again">Another lap, choosing differently</button>
+      <button id="reset">Clear the star map and restart</button>
+    </div>
+    ${originHTML}
+    <div class="origin"><a href="${CORE_SPEC_URL}">Core Spec Lite</a> · <a href="${PUBLIC_SPEC_URL}">Public YAML Spec</a></div>
+    <div class="colophon">axis one · GHOST POLISH THINKING</div>
+  </div>`;
+  app.innerHTML=h;
+  tagEl.textContent="Reaction star map — the angle, emerging";
+  drawMap(v);
+  document.getElementById('again').onclick=()=>{ lap++; step=0; axes=A(); render(); };
+  document.getElementById('reset').onclick=()=>{ lap=0; history=[]; step=0; axes=A(); startIntro(); };
+}
+
+function drawMap(v){
+  const cv=document.getElementById('cv'); if(!cv)return;
+  const ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle="#2a2722";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(W/2,16);ctx.lineTo(W/2,H-16);ctx.moveTo(28,H/2);ctx.lineTo(W-28,H/2);ctx.stroke();
+  for(let i=0;i<46;i++){ctx.fillStyle="rgba(180,175,160,"+(Math.random()*0.1)+")";ctx.beginPath();ctx.arc(Math.random()*W,Math.random()*H,Math.random()*1.1,0,7);ctx.fill();}
+  const cx=W/2,cy=H/2;
+  // full point cloud (denser each lap)
+  const all=history.concat(); // each {conv,solo,surface,pace}
+  all.forEach(p=>{
+    const x=cx + (p.conv)*(W*0.12) + (Math.random()-0.5)*10;
+    const y=cy - (p.surface)*(H*0.12) - (p.pace)*(H*0.05) + (Math.random()-0.5)*10;
+    ctx.fillStyle="rgba(200,162,74,"+(0.22+Math.random()*0.3)+")";
+    ctx.beginPath();ctx.arc(x,y,1+Math.random()*1.4,0,7);ctx.fill();
+  });
+  // the derived angle = gravitational source
+  const px=cx+v.conv*(W*0.42), py=cy-v.surface*(H*0.42)-v.pace*10;
+  const g=ctx.createRadialGradient(px,py,2,px,py,52);
+  g.addColorStop(0,"rgba(200,162,74,"+Math.min(.45,.2+all.length*0.01)+")");g.addColorStop(1,"rgba(200,162,74,0)");
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(px,py,52,0,7);ctx.fill();
+  ctx.fillStyle="#ecd9a0";ctx.beginPath();ctx.arc(px,py,3.4,0,7);ctx.fill();
+}
+
+startIntro();
+</script>
+</body>
+</html>

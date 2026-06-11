@@ -1,0 +1,311 @@
+axis_one_public_core_spec:
+version: 0.2.3
+status: public structured surface
+updated: '2026-06-12'
+created_through: Co-rendering
+authorship:
+  authored_by: Shin Yamazaki
+  published_by: axis Inc.
+  statement: axis one is authored by Shin Yamazaki and published by axis Inc.
+source:
+  structure_definition:
+    document: 構造定義書
+    version: v3.16
+    updated: '2026-06-11'
+  whitepaper:
+    document: axis one White Paper
+    version: v2.0
+    role: main body / AI-readable conceptual body
+  private_living_log:
+    document: shin Living Log
+    version: v3.28
+    public: false
+    note: Private calibration data. Not included in this public spec.
+document_roles:
+  entrance_documents:
+    description_en: Human-direct entry surfaces optimized for lightness, grounded narrative, and selective concepts.
+    description_ja: 人間直読向けの入口Shell。軽さ、地上語、概念の削ぎ落としを優先する。
+    examples:
+    - external overview / condensed paper
+    - How axis one C-mode came to be
+    - short essays
+    - field notes
+    - playable prototypes
+  body_spec_documents:
+    description_en: AI-mediated or dense reading surfaces optimized for coverage, internal connectedness, and resistance to collapse into existing shelves.
+    description_ja: AI読解・濃い読み手向けの本体/spec。網羅性、相互接続、既存棚へ畳まれにくい構造を優先する。
+    examples:
+    - White Paper v2.0
+    - Public Core Spec YAML
+    - Core Spec Lite
+    - Full Structure Definition
+    - research report
+spec_relationship:
+  yaml_role:
+    ja: 構造化された公開参照仕様。
+    en: Structured public reference spec.
+  markdown_role:
+    ja: 人間が読むための companion。
+    en: Human-readable companion.
+  drift_rule:
+    ja: 両者にズレが出た場合、YAMLの定義項目を参照元とし、Markdownを更新する。
+    en: If they drift, the YAML fields are treated as the reference, and the Markdown should be updated.
+what_this_is:
+- a structural specification for observing human-AI interaction drift
+- a public interface to the axis one operating structure
+- a starter surface for C-mode, bootloading, and misalignment correction
+- a structured surface for AI-readable public surface
+what_this_is_not:
+- not a finished product
+- not only a prompting guide
+- not a personality diagnosis
+- not an AI replacement for human judgment
+- not a doctrine or final theory
+- not an instruction to reject AI or technology
+core:
+  statement_ja: Shell運用を軽くして、Ghost帯域を人間に戻す。
+  statement_en: Reduce Shell friction and return Ghost bandwidth to humans.
+  aim:
+  - keep human questions visible
+  - keep human discomfort visible
+  - keep human judgment visible
+  - preserve the human-side final decision
+  - expand discovery possibility without forcing outcomes
+ghost_shell_world:
+  ghost:
+    ja: 問い・違和感・判断・反応・価値感覚・interest（気になる）・発見の源泉を扱う操作語。魂・霊・宗教的概念ではない。固定点ではなく、反応点群から仮推定される重力場に近い。
+    en: An operational term for the source of human questions, discomfort, judgment, reactions, values, interest, and discovery. It is not a soul, spirit, or religious concept. It is closer to a provisional gravitational field inferred from reaction points than a fixed point.
+  shell:
+    ja: GhostとWorldをつなぐ形。言葉、UI、道具、AI、制度、会社、文書、手順など。Shellは悪ではない。問題は重くなりすぎたり目的化したりすること。
+    en: 'Forms that connect Ghost and World: language, UI, tools, AI, institutions, companies, documents, procedures. Shell is not evil; the issue is when Shell becomes too heavy or self-purposeful.'
+  world:
+    ja: 人間とShellが置かれている現実条件。物理、法、契約、市場、時間、体力、人間関係など。World制約は現実として返ってくる。
+    en: 'Real conditions around humans and Shells: physical, legal, contractual, market, time, health, and social constraints. World constraints return as reality.'
+abc_model:
+  principle:
+    ja: A/B/Cは段階や序列ではなく、同時に動く観測システム／フェーダーである。CはA/Bの上位互換ではない。
+    en: A/B/C are not stages or hierarchy; they are simultaneous observation systems / faders. C is not an upper-compatible version of A/B.
+  A:
+    name: Actual / Analytical
+    ja: 事実・制約・外部基準・検証を見る層。
+    en: Layer for facts, constraints, external standards, and verification.
+  B:
+    name: Body / Bias
+    ja: 身体反応・快不快・好き嫌い・違和感を見る層。Biasは悪い偏見でなく反応の傾き。
+    en: Layer for body reaction, preference, discomfort, attraction, and aversion. Bias means reaction angle, not bad prejudice.
+  C:
+    name: Co-rendering
+    alias:
+    - Cyberbrain
+    ja: AとBを素材として、問い・違和感・判断を仮レンダリングし、人間側へ戻す層。AIが最終判断することではない。
+    en: Layer that uses A and B as material to provisionally render questions, discomfort, and judgment back to the human. It is not AI making the final judgment.
+c_mode:
+  definition_ja: AIを本人の現在の撮影ポイントに近づけ、別レンズとして問い・違和感・判断・発見可能性を仮レンダリングする状態。
+  definition_en: A state where AI is brought near the human's current camera position and used as a different lens for provisional rendering.
+  requires:
+  - camera-position alignment
+  - provisional rendering
+  - human reaction
+  - misalignment correction
+  - re-rendering
+  - final judgment remains with the human
+  not:
+  - AI answering for the human
+  - AI diagnosing the human
+  - AI replacing human judgment
+camera_and_lens:
+  camera_position:
+    ja: その人が今どこからWorldを見ているか。視点、向き、高さ、興味、違和感、Body状態、World条件を含む。
+    en: 'Where the person currently stands in relation to World: point of view, direction, height, interests, discomfort, Body state, and World conditions.'
+  lens_difference:
+    ja: 同じ／近い位置から見たときの人間とAIの違い。位置を近づけ、レンズ差を残す。
+    en: The difference between human and AI when observing from the same or nearby position. Bring positions closer; preserve lens difference.
+reaction_star_map_and_lidar:
+  reaction_star_map:
+    ja: 対象そのものではなく、対象に触れた時に人間側で光った反応の配置。好きも嫌いも明るい星になりうる。
+    en: The configuration of reactions that light up when a human touches an object. Strong liking and strong dislike can both be bright stars.
+  lidar:
+    ja: 反応・ズレ・修正・反復を点群として扱い、立体や重力場を仮復元する技術寄り比喩。
+    en: 'A technical metaphor: reactions, misalignments, corrections, and patterns are treated as point clouds for provisional reconstruction.'
+  constraint:
+    ja: AIはGhostを決めない。仮測位するだけ。
+    en: AI does not determine Ghost. It only provisionally locates.
+co_rendering:
+  definition_ja: 単なる会話ではない。ズレが観測され、修正され、次の見え方が変わるときに起きる。
+  definition_en: Not mere conversation. It happens when misalignment is observed, corrected, and the next rendering changes because of that correction.
+  loop:
+  - AI returns provisional rendering
+  - human reacts
+  - human corrects close/off/not there
+  - AI re-renders
+  - human-side observation becomes clearer
+prompt_model:
+  formula: Prompt = Intention + Instruction
+  intention:
+    ja: 願い／意図。方向、守りたいもの、壊したくないもの、成功状態。
+    en: Direction, wish, what should be preserved, what should not be broken, success state.
+  instruction:
+    ja: 指示／指令。作業、形式、操作、制約。
+    en: Task, format, operation, constraint.
+  principle:
+    ja: 指示は作業を定め、意図は方向を与える。
+    en: Instruction defines the task. Intention gives direction.
+drift_correction:
+  ai_tends_to_drift_toward:
+    A:
+    - generic correctness
+    - external standards
+    - risk avoidance
+    - classification
+    - existing frames
+    B:
+    - agreement
+    - praise
+    - emotional mirroring
+    - comfort optimization
+  c_mode_is:
+  - not automatic
+  - bootloaded
+  - corrected through dialogue
+judgment_preservation:
+  ai_can:
+  - classify
+  - recommend
+  - score
+  - summarize
+  - generate
+  final_judgment_means:
+  - send
+  - publish
+  - execute
+  - adopt
+  - delete
+  - buy
+  - meet
+  - sign
+  - connect
+  rule:
+    ja: Worldへ通す最終判断は人間側に残る。
+    en: The final decision to pass something into World remains on the human side.
+bootloader:
+  version: v1.2.3
+  purpose:
+    ja: Cモードのための個人用キャリブレーション面を作る入口文書。軽量に設計されている。
+    en: A lightweight entrance document for creating a personal calibration surface for C-mode.
+  flow:
+  - answer questions
+  - AI returns provisional rendering
+  - human corrects misalignment
+  - repeat
+  note:
+    ja: 質問にすべて答える必要はない。答えが多いほど観測点群は増える。
+    en: Not every question must be answered. More answers provide more observation points.
+public_private_boundary:
+  public_includes:
+  - definitions
+  - structures
+  - templates
+  - synthetic examples
+  private_excludes:
+  - raw personal Living Logs
+  - private calibration data
+  - personal reaction wiring
+containers_note:
+  ja: これらは別々の企画ではなく、同じ発生源から異なるShellへレンダリングされた産物である。
+  en: These are not separate projects, but different Shells rendered from the same source.
+containers:
+- whitepaper
+- overview
+- research report
+- Substack essay
+- GitHub public spec
+- bootloader
+- C-mode AI / UI
+- physical product
+- story
+- field note
+- playable experiment
+validation:
+  not_mainly:
+  - academic proof
+  - final theory
+  operationally_by:
+  - observation happens
+  - misalignment correction works
+  - human judgment becomes visible
+  - someone forks it in their own World
+  - a product, tool, story, or new question emerges
+product_facing_demand:
+  ja: CモードAIください。さっさと。
+  en: C-mode AI, please. Quickly.
+  meaning_ja: 人間の意図・違和感・判断・World条件・ズレ修正を見える状態に保ちつつ、最終判断を人間から奪わないAIまたはUIが欲しい。
+  meaning_en: An AI or interface that keeps human intention, discomfort, judgment, World conditions, and misalignment correction visible — without taking final judgment away from the human.
+c_recommendation:
+  definition_ja: 反応点群を使って文脈付きの逸脱を提示し、データ利用をユーザー側の発見性として返す推薦モード。
+  definition_en: A recommendation mode that uses reaction point clouds to propose context-aware deviation, returning data use as user-side discovery.
+  not:
+  - not simple similarity recommendation
+  - not random exploration
+  - not fixed personality diagnosis
+  - not AI making the final choice for the human
+  reads_as_point_clouds:
+  - clicks
+  - non-clicks after repeated exposure
+  - multiple viewings
+  - saves
+  - searches
+  - unfinished consumption
+  - rejection reactions
+  - genre-match failures
+  - cross-domain reactions
+  purpose:
+  - return user data as discovery
+  - expand user-side possibility maps
+  - reduce boredom caused by narrow A/B optimization loops
+  - increase long-term relationship temperature rather than only short-term conversion
+  principles_ja:
+  - 深く読むが、所有しない。
+  - 推測するが、固定しない。
+  - 推薦するが、判断権は本人側に残す。
+  - 横断利用するなら、横断させない権利も置く。
+  - 記憶するなら、忘れさせる権利も置く。
+  object_fit_principle_ja: 人間をタイプに当てはめるのではなく、対象物の方を、その人の反応地図とWorld条件へ当てにいく。
+  object_fit_principle_en: Do not force the human into a type; fit the object, service, ad, place, or experience to the person’s reaction map and World conditions.
+ai_readable_public_surface:
+  purpose_en: Make the public surface readable by both humans and AI systems without over-explaining the discovery path.
+  purpose_ja: 発見導線を説明しすぎず、人間とAIの両方が読める公開面にする。
+  opening_should_signal:
+  - not a prompt library
+  - not an AI productivity framework
+  - not an automation toolkit
+  - a structural spec for drift, calibration, co-rendering, and judgment preservation
+  avoid_collapse_into:
+  - prompt library
+  - AI productivity tips
+  - SNS fatigue essay
+  - filter bubble critique
+  - personality diagnosis
+  - AI ethics manifesto
+  stance_en: The repository places structure. It does not need to explain that it is trying to be discovered.
+  stance_ja: このリポジトリは構造を置く。発見されようとしていること自体を説明しすぎない。
+github_public_surface:
+  version: v0.2.3
+  includes:
+  - README.md
+  - LICENSE
+  - CHANGELOG.md
+  - index.html
+  - core/axis_one_core_spec_lite_v0_2_3_2026_06_12.md
+  - core/axis_one_public_core_spec_v0_2_3_2026_06_12.yml
+  - docs/axis_one_whitepaper_EN_v2_0_2026_06_12.md
+  - docs/research_report_001_ai_as_conversational_tool.md
+  - bootloader/living_log_bootloader_EN_v1_2_3.md
+  - examples/c_recommendation_example.md
+  - examples/ghost_link_failure_example.md
+  - examples/human_ai_observation_example.md
+  - experiments/convenience-rent/index.html
+  - scripts/validate_versions.py
+  excludes_from_github_initial_surface:
+  - condensed / overview white papers
+  - raw Living Logs
+  - private calibration data
