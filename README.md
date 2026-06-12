@@ -243,6 +243,7 @@ MIT License.
 
 - [Official site](https://www.axis-3.com)
 - [Whitepaper](https://www.axis-3.com/whitepaper)
+- [Substack](https://shiny1229.substack.com/p/i-published-axis-one-on-github)
 - [Contact](https://www.axis-3.com/contact)
 - [Repository](https://github.com/ShinY1229/axis-one)
 
