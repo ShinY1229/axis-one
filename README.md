@@ -1,4 +1,4 @@
-# axis one
+# axis-one / human-ai-co-rendering
 
 axis one is **not** a prompt library, AI productivity framework, or automation toolkit.
 
